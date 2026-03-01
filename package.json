@@ -8,6 +8,9 @@
   "scripts": {
     "dev": "tsx watch src/index.ts"
   },
+  "engines": {
+    "node": "24.x"
+  },
   "devDependencies": {
     "@types/node": "^24.11.0",
     "eslint": "^9.39.2",

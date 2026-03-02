@@ -10,9 +10,12 @@ import {
   validatorCompiler,
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
+import { IncomingHttpHeaders } from "http";
 import z from "zod";
 
+import { WeekDay } from "./generated/prisma/enums.js";
 import { auth } from "./lib/auth.js";
+import { CreateWorkoutPlan } from "./usecases/CreateWorkoutPlan.js";
 
 const app = Fastify({
   logger: true,
@@ -64,6 +67,77 @@ await app.register(fastifyApiReference, {
         url: "/api/auth/open-api/generate-schema",
       },
     ],
+  },
+});
+
+app.withTypeProvider<ZodTypeProvider>().route({
+  method: "POST",
+  url: "/workout-plan",
+  schema: {
+    body: z.object({
+      name: z.string().trim().min(1),
+      workoutDays: z.array(
+        z.object({
+          name: z.string().trim().min(1),
+          WeekDay: z.enum(WeekDay),
+          isRest: z.boolean().default(false),
+          estimatedDurationInSeconds: z.number().min(1),
+          exercises: z.array(
+            z.object({
+              order: z.number().min(0),
+              name: z.string().trim().min(1),
+              sets: z.number().min(1),
+              reps: z.number().min(1),
+              restTimeInSeconds: z.number().min(1),
+            }),
+          ),
+        }),
+      ),
+    }),
+    response: {
+      201: z.object({
+        id: z.uuid(),
+        name: z.string().trim().min(1),
+        WeekDay: z.enum(WeekDay),
+        isRest: z.boolean().default(false),
+        estimatedDurationInSeconds: z.number().min(1),
+        exercises: z.array(
+          z.object({
+            order: z.number().min(0),
+            name: z.string().trim().min(1),
+            sets: z.number().min(1),
+            reps: z.number().min(1),
+            restTimeInSeconds: z.number().min(1),
+          }),
+        ),
+      }),
+      400: z.object({
+        error: z.string(),
+        code: z.string(),
+      }),
+      401: z.object({
+        error: z.string(),
+        code: z.string(),
+      }),
+    },
+  },
+  handler: async (request, reply) => {
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(request.headers),
+    });
+    if (!session) {
+      return reply.status(401).send({
+        error: "Unautorized",
+        code: "UNAUTHORIZED",
+      });
+    }
+    const createWorkoutPlan = new CreateWorkoutPlan();
+    const result = await createWorkoutPlan.execute({
+      userId: request.user.id,
+      name: request.body.name,
+      workoutDays: request.body.workoutDays,
+    });
+    return reply.status(201).send(result);
   },
 });
 
@@ -138,4 +212,7 @@ try {
 } catch (err) {
   app.log.error(err);
   process.exit(1);
+}
+function fromNodeHeaders(headers: IncomingHttpHeaders): Headers {
+  throw new Error("Function not implemented.");
 }

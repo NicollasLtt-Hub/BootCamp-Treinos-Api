@@ -2,7 +2,6 @@ import "dotenv/config";
 
 import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
-// import fastifySwaggerUI from "@fastify/swagger-ui";
 import fastifyApiReference from "@scalar/fastify-api-reference";
 import Fastify from "fastify";
 import {
@@ -39,13 +38,13 @@ await app.register(fastifySwagger, {
   transform: jsonSchemaTransform,
 });
 
-// await app.register(fastifySwaggerUI, {
-//   routePrefix: "/docs",
-// });
-
-//Preparo pro Front-End
+//Preparo pro Front-End e para o playground de API (/docs)
 await app.register(fastifyCors, {
-  origin: ["http://localhost:3000"],
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:8081",
+    "http://127.0.0.1:8081",
+  ],
   credentials: true,
 });
 

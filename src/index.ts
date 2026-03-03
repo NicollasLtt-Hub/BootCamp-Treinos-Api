@@ -32,23 +32,19 @@ await app.register(fastifySwagger, {
       description: "API para o bootcamp de treinos do FSC",
       version: "1.0.0",
     },
-    servers: [
-      {
-        description: "Localhost",
-        url: "http://localhost:8081",
-      },
-    ],
+      servers: [
+        {
+          description: "Localhost",
+          url: "http://127.0.0.1:8081",
+        },
+      ],
   },
   transform: jsonSchemaTransform,
 });
 
 //Preparo pro Front-End e para o playground de API (/docs)
 await app.register(fastifyCors, {
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:8081",
-    "http://127.0.0.1:8081",
-  ],
+  origin: ["http://localhost:3000", "http://127.0.0.1:8081"],
   credentials: true,
 });
 
@@ -227,7 +223,26 @@ app.route({
       const response = await auth.handler(req);
       // Forward response to client
       reply.status(response.status);
-      response.headers.forEach((value, key) => reply.header(key, value));
+
+      // Handle Set-Cookie specifically to support multiple cookies
+      const setCookie = response.headers.getSetCookie?.();
+      if (setCookie) {
+        reply.header("set-cookie", setCookie);
+      }
+
+      response.headers.forEach((value, key) => {
+        // Skip headers that should be handled by Fastify or that cause issues
+        const skipHeaders = [
+          "set-cookie",
+          "content-length",
+          "content-encoding",
+          "transfer-encoding",
+        ];
+        if (!skipHeaders.includes(key.toLowerCase())) {
+          reply.header(key, value);
+        }
+      });
+
       reply.send(response.body ? await response.text() : null);
     } catch (error) {
       app.log.error(error);

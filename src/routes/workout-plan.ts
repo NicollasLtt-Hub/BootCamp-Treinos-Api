@@ -15,8 +15,8 @@ import {
   GetWorkoutDayResponseSchema,
   GetWorkoutPlanParamsSchema,
   GetWorkoutPlanResponseSchema,
-  GetWorkoutPlansQuerySchema,
-  GetWorkoutPlansResponseSchema,
+  ListWorkoutPlansQuerySchema,
+  ListWorkoutPlansResponseSchema,
   StartWorkoutSessionParamsSchema,
   StartWorkoutSessionResponseSchema,
   WorkoutPlanResponseSchema,
@@ -25,7 +25,7 @@ import { CompleteWorkoutSession } from "../usecases/CompleteWorkoutSession.js";
 import { CreateWorkoutPlan } from "../usecases/CreateWorkoutPlan.js";
 import { GetWorkoutDay } from "../usecases/GetWorkoutDay.js";
 import { GetWorkoutPlan } from "../usecases/GetWorkoutPlan.js";
-import { GetWorkoutPlans } from "../usecases/GetWorkoutPlans.js";
+import { ListWorkoutPlans } from "../usecases/ListWorkoutPlans.js";
 import { StartWorkoutSession } from "../usecases/StartWorkoutSession.js";
 
 export const workoutPlanRoutes = async (app: FastifyInstance) => {
@@ -35,9 +35,9 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     schema: {
       tags: ["Workout Plan"],
       summary: "List all workout plans",
-      querystring: GetWorkoutPlansQuerySchema,
+      querystring: ListWorkoutPlansQuerySchema,
       response: {
-        200: GetWorkoutPlansResponseSchema,
+        200: ListWorkoutPlansResponseSchema,
         401: ErrorSchema,
         500: ErrorSchema,
       },
@@ -54,14 +54,14 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
           });
         }
 
-        const getWorkoutPlans = new GetWorkoutPlans();
+        const listWorkoutPlans = new ListWorkoutPlans();
         
         let activeFilter: boolean | undefined = undefined;
         if (request.query.active !== undefined) {
           activeFilter = request.query.active === "true";
         }
 
-        const result = await getWorkoutPlans.execute({
+        const result = await listWorkoutPlans.execute({
           userId: session.user.id,
           active: activeFilter,
         });

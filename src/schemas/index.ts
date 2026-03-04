@@ -155,11 +155,11 @@ export const GetStatsResponseSchema = z.object({
     totalTimeInSeconds: z.number(),
 })
 
-export const GetWorkoutPlansQuerySchema = z.object({
+export const ListWorkoutPlansQuerySchema = z.object({
     active: z.enum(['true', 'false']).optional(),
 })
 
-export const GetWorkoutPlansResponseSchema = z.array(
+export const ListWorkoutPlansResponseSchema = z.array(
     z.object({
         id: z.string(),
         name: z.string(),

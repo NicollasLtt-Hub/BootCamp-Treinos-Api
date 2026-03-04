@@ -29,7 +29,7 @@ interface OutputDto {
   }>;
 }
 
-export class GetWorkoutPlans {
+export class ListWorkoutPlans {
   async execute(dto: InputDto): Promise<Array<OutputDto>> {
     const workoutPlans = await prisma.workoutPlan.findMany({
       where: {

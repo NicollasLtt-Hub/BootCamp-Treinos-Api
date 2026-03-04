@@ -13,6 +13,7 @@ import {
 import z from "zod";
 
 import { auth } from "./lib/auth.js";
+import { aiRoutes } from "./routes/ai.js";
 import { homeRoutes } from "./routes/home.js";
 import { meRoutes } from "./routes/me.js";
 import { statsRoutes } from "./routes/stats.js";
@@ -72,6 +73,7 @@ await app.register(workoutPlanRoutes, {prefix: "/workout-plan"});
 await app.register(homeRoutes, {prefix: "/home"});
 await app.register(statsRoutes, {prefix: "/stats"});
 await app.register(meRoutes, {prefix: "/me"});
+await app.register(aiRoutes, {prefix: "/ai"});
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
@@ -164,23 +166,3 @@ try {
   app.log.error(err);
   process.exit(1);
 }
-
-// Just in case I need it later
-// function fromNodeHeaders(headers: IncomingHttpHeaders): Headers {
-//   const result = new Headers();
-
-//   for (const [key, value] of Object.entries(headers)) {
-//     if (typeof value === "undefined") continue;
-
-//     if (Array.isArray(value)) {
-//       for (const v of value) {
-//         result.append(key, v);
-//       }
-//       continue;
-//     }
-
-//     result.append(key, value);
-//   }
-
-//   return result;
-// }

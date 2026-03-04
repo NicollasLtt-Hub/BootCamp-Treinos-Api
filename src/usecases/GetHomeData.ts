@@ -133,38 +133,49 @@ export class GetHomeData {
     currentDate: dayjs.Dayjs
   ): number {
     let streak = 0;
-    let checkDate = currentDate;
+    let day = currentDate;
+    const isToday = dayjs.utc().format("YYYY-MM-DD") === currentDate.format("YYYY-MM-DD");
 
-    // Percorrer de trás pra frente até 365 dias (limite de segurança)
-    for (let i = 0; i < 365; i++) {
-      const dayName = WEEKDAY_MAP[checkDate.day()];
-      const workoutDay = workoutDays.find((d) => d.weekDay === dayName);
+    const planWeekDays = new Set(workoutDays.map((d) => d.weekDay));
+    const restWeekDays = new Set(
+      workoutDays.filter((d) => d.isRest).map((d) => d.weekDay)
+    );
 
-      if (!workoutDay) {
-        // Não há treino definido para esse dia — interrompe o streak
-        break;
-      }
-
-      if (workoutDay.isRest) {
-        // Dia de descanso conta automaticamente
-        streak++;
-      } else {
-        // Verificar se há sessão completada nesse dia
-        const dateStr = checkDate.format("YYYY-MM-DD");
-        const hasCompletedSession = workoutDay.workoutSessions.some(
-          (session) =>
-            session.completedAt !== null &&
-            dayjs.utc(session.startedAt).format("YYYY-MM-DD") === dateStr
-        );
-
-        if (hasCompletedSession) {
-          streak++;
-        } else {
-          break;
+    const completedDates = new Set<string>();
+    workoutDays.forEach((dayInfo) => {
+      dayInfo.workoutSessions.forEach((session) => {
+        if (session.completedAt !== null) {
+          completedDates.add(dayjs.utc(session.startedAt).format("YYYY-MM-DD"));
         }
+      });
+    });
+
+    for (let i = 0; i < 365; i++) {
+      const weekDay = WEEKDAY_MAP[day.day()];
+
+      if (!planWeekDays.has(weekDay)) {
+        day = day.subtract(1, "day");
+        continue;
       }
 
-      checkDate = checkDate.subtract(1, "day");
+      if (restWeekDays.has(weekDay)) {
+        day = day.subtract(1, "day");
+        continue;
+      }
+
+      const dateKey = day.format("YYYY-MM-DD");
+      if (completedDates.has(dateKey)) {
+        streak++;
+        day = day.subtract(1, "day");
+        continue;
+      }
+
+      if (i === 0 && isToday) {
+        day = day.subtract(1, "day");
+        continue;
+      }
+
+      break;
     }
 
     return streak;

@@ -10,12 +10,15 @@ import {
   CompleteWorkoutSessionResponseSchema,
   GetWorkoutPlanParamsSchema,
   GetWorkoutPlanResponseSchema,
+  GetWorkoutDayParamsSchema,
+  GetWorkoutDayResponseSchema,
 } from "../schemas/index.js";
 import { auth } from "../lib/auth.js";
 import { CreateWorkoutPlan } from "../usecases/CreateWorkoutPlan.js";
 import { StartWorkoutSession } from "../usecases/StartWorkoutSession.js";
 import { CompleteWorkoutSession } from "../usecases/CompleteWorkoutSession.js";
 import { GetWorkoutPlan } from "../usecases/GetWorkoutPlan.js";
+import { GetWorkoutDay } from "../usecases/GetWorkoutDay.js";
 import { NotFoundError } from "../errors/index.js";
 import { WorkoutPlanNotActiveError } from "../errors/WorkoutPlanNotActiveError.js";
 import { ConflictError } from "../errors/ConflictError.js";
@@ -52,6 +55,56 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
         const result = await getWorkoutPlan.execute({
           userId: session.user.id,
           id: request.params.id,
+        });
+
+        return reply.status(200).send(result);
+      } catch (error) {
+        app.log.error(error);
+        if (error instanceof NotFoundError) {
+          return reply.status(404).send({
+            error: error.message,
+            code: "NOT_FOUND_ERROR",
+          });
+        }
+        return reply.status(500).send({
+          error: "Internal server error",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
+    },
+  });
+
+  app.withTypeProvider<ZodTypeProvider>().route({
+    method: "GET",
+    url: "/:workoutPlanId/days/:workoutDayId",
+    schema: {
+      tags: ["Workout Plan"],
+      summary: "Get workout day details",
+      params: GetWorkoutDayParamsSchema,
+      response: {
+        200: GetWorkoutDayResponseSchema,
+        401: ErrorSchema,
+        404: ErrorSchema,
+        500: ErrorSchema,
+      },
+    },
+    handler: async (request, reply) => {
+      try {
+        const session = await auth.api.getSession({
+          headers: fromNodeHeaders(request.headers),
+        });
+        if (!session) {
+          return reply.status(401).send({
+            error: "Unauthorized",
+            code: "UNAUTHORIZED",
+          });
+        }
+
+        const getWorkoutDay = new GetWorkoutDay();
+        const result = await getWorkoutDay.execute({
+          userId: session.user.id,
+          workoutPlanId: request.params.workoutPlanId,
+          workoutDayId: request.params.workoutDayId,
         });
 
         return reply.status(200).send(result);

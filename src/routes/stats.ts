@@ -1,14 +1,15 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
+import { IncomingHttpHeaders } from "http";
+
+import { NotFoundError } from "../errors/index.js";
+import { auth } from "../lib/auth.js";
 import {
   ErrorSchema,
   GetStatsQuerySchema,
   GetStatsResponseSchema,
 } from "../schemas/index.js";
-import { auth } from "../lib/auth.js";
 import { GetStats } from "../usecases/GetStats.js";
-import { NotFoundError } from "../errors/index.js";
-import { IncomingHttpHeaders } from "http";
 
 export const statsRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({

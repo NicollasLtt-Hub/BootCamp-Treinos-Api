@@ -1,4 +1,5 @@
 import z from "zod";
+
 import { WeekDay } from "../generated/prisma/enums.js";
 
 export const ErrorSchema = z.object({
@@ -186,3 +187,21 @@ export const GetWorkoutPlansResponseSchema = z.array(
         ),
     })
 )
+
+export const UpsertUserTrainDataBodySchema = z.object({
+    weightInGrams: z.number().int().positive(),
+    heightInCentimeters: z.number().int().positive(),
+    age: z.number().int().positive(),
+    bodyFatPercentage: z.number().int().min(1).max(100),
+})
+
+export const UserTrainDataResponseSchema = z.object({
+    userId: z.string(),
+    userName: z.string(),
+    weightInGrams: z.number(),
+    heightInCentimeters: z.number(),
+    age: z.number(),
+    bodyFatPercentage: z.number(),
+})
+
+export const GetUserTrainDataResponseSchema = UserTrainDataResponseSchema.nullable()

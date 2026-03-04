@@ -1,31 +1,32 @@
 import { FastifyInstance } from "fastify";
 import { ZodTypeProvider } from "fastify-type-provider-zod";
-import {
-  ErrorSchema,
-  WorkoutPlanResponseSchema,
-  StartWorkoutSessionParamsSchema,
-  StartWorkoutSessionResponseSchema,
-  CompleteWorkoutSessionParamsSchema,
-  CompleteWorkoutSessionBodySchema,
-  CompleteWorkoutSessionResponseSchema,
-  GetWorkoutPlanParamsSchema,
-  GetWorkoutPlanResponseSchema,
-  GetWorkoutDayParamsSchema,
-  GetWorkoutDayResponseSchema,
-  GetWorkoutPlansQuerySchema,
-  GetWorkoutPlansResponseSchema,
-} from "../schemas/index.js";
-import { auth } from "../lib/auth.js";
-import { CreateWorkoutPlan } from "../usecases/CreateWorkoutPlan.js";
-import { StartWorkoutSession } from "../usecases/StartWorkoutSession.js";
-import { CompleteWorkoutSession } from "../usecases/CompleteWorkoutSession.js";
-import { GetWorkoutPlan } from "../usecases/GetWorkoutPlan.js";
-import { GetWorkoutPlans } from "../usecases/GetWorkoutPlans.js";
-import { GetWorkoutDay } from "../usecases/GetWorkoutDay.js";
+import { IncomingHttpHeaders } from "http";
+
+import { ConflictError } from "../errors/ConflictError.js";
 import { NotFoundError } from "../errors/index.js";
 import { WorkoutPlanNotActiveError } from "../errors/WorkoutPlanNotActiveError.js";
-import { ConflictError } from "../errors/ConflictError.js";
-import { IncomingHttpHeaders } from "http";
+import { auth } from "../lib/auth.js";
+import {
+  CompleteWorkoutSessionBodySchema,
+  CompleteWorkoutSessionParamsSchema,
+  CompleteWorkoutSessionResponseSchema,
+  ErrorSchema,
+  GetWorkoutDayParamsSchema,
+  GetWorkoutDayResponseSchema,
+  GetWorkoutPlanParamsSchema,
+  GetWorkoutPlanResponseSchema,
+  GetWorkoutPlansQuerySchema,
+  GetWorkoutPlansResponseSchema,
+  StartWorkoutSessionParamsSchema,
+  StartWorkoutSessionResponseSchema,
+  WorkoutPlanResponseSchema,
+} from "../schemas/index.js";
+import { CompleteWorkoutSession } from "../usecases/CompleteWorkoutSession.js";
+import { CreateWorkoutPlan } from "../usecases/CreateWorkoutPlan.js";
+import { GetWorkoutDay } from "../usecases/GetWorkoutDay.js";
+import { GetWorkoutPlan } from "../usecases/GetWorkoutPlan.js";
+import { GetWorkoutPlans } from "../usecases/GetWorkoutPlans.js";
+import { StartWorkoutSession } from "../usecases/StartWorkoutSession.js";
 
 export const workoutPlanRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({

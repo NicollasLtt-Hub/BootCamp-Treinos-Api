@@ -134,3 +134,22 @@ export const GetHomeDataResponseSchema = z.object({
         }),
     ),
 })
+
+export const GetStatsQuerySchema = z.object({
+    from: z.string().date(),
+    to: z.string().date(),
+})
+
+export const GetStatsResponseSchema = z.object({
+    workoutStreak: z.number(),
+    consistencyByDay: z.record(
+        z.string().date(),
+        z.object({
+            workoutDayCompleted: z.boolean(),
+            workoutDayStarted: z.boolean(),
+        }),
+    ),
+    completedWorkoutsCount: z.number(),
+    conclusionRate: z.number(),
+    totalTimeInSeconds: z.number(),
+})

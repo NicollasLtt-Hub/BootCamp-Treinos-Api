@@ -33,6 +33,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     method: "GET",
     url: "/",
     schema: {
+      operationId: "listWorkoutPlans",
       tags: ["Workout Plan"],
       summary: "List all workout plans",
       querystring: ListWorkoutPlansQuerySchema,
@@ -81,6 +82,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     method: "GET",
     url: "/:id",
     schema: {
+      operationId: "getWorkoutPlan",
       tags: ["Workout Plan"],
       summary: "Get workout plan by id",
       params: GetWorkoutPlanParamsSchema,
@@ -130,6 +132,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     method: "GET",
     url: "/:workoutPlanId/days/:workoutDayId",
     schema: {
+      operationId: "getWorkoutDay",
       tags: ["Workout Plan"],
       summary: "Get workout day details",
       params: GetWorkoutDayParamsSchema,
@@ -180,6 +183,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
   method: "POST",
   url: "/",
   schema: {
+    operationId: "createWorkoutPlan",
     tags: ["Workout Plan"],
     summary: "Create a workout plan", 
     body: WorkoutPlanResponseSchema.omit({id:true, userId:true, isActive:true}),
@@ -229,6 +233,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     method: "POST",
     url: "/:workoutPlanId/days/:workoutDayId/sessions",
     schema: {
+      operationId: "startWorkoutSession",
       tags: ["Workout Plan"],
       summary: "Start a workout session",
       params: StartWorkoutSessionParamsSchema,
@@ -293,8 +298,9 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
     method: "PATCH",
     url: "/:workoutPlanId/days/:workoutDayId/sessions/:sessionId",
     schema: {
+      operationId: "updateWorkoutSession",
       tags: ["Workout Plan"],
-      summary: "Complete a workout session",
+      summary: "Update a workout session",
       params: CompleteWorkoutSessionParamsSchema,
       body: CompleteWorkoutSessionBodySchema,
       response: {

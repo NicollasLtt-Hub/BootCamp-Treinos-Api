@@ -17,6 +17,7 @@ export const meRoutes = async (app: FastifyInstance) => {
     method: "GET",
     url: "/",
     schema: {
+      operationId: "getMe",
       tags: ["Me"],
       summary: "Get my train data",
       response: {
@@ -57,7 +58,8 @@ export const meRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({
     method: "PUT",
     url: "/",
-    schema: {
+    schema: { 
+      operationId: "upsertMe",
       tags: ["Me"],
       summary: "Upsert my train data",
       body: UpsertUserTrainDataBodySchema,
